@@ -1,0 +1,2 @@
+export const EXTENSION_NAME = 'vue-i18n-op'
+export const TRANSLATE_API = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=en&hl=zh-CN&dt=t&dt=bd&ie=UTF-8&oe=UTF-8&dj=1&source=icon&q='

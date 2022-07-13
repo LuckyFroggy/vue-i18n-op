@@ -1,0 +1,150 @@
+{
+  "name": "vue-i18n-op",
+  "displayName": "Vue I18n OP",
+  "description": "一款针对Vue项目的进行快速国际化翻译与替换的插件🤳",
+  "version": "1.0.0",
+  "publisher": "LuckyFroggy",
+  "engines": {
+    "vscode": "^1.54.0"
+  },
+  "license": "MIT",
+  "categories": [
+    "Other"
+  ],
+  "icon": "assets/icon-vue-i18n-op.png",
+  "activationEvents": [
+		"onLanguage:javascript",
+		"onLanguage:typescript",
+    "onLanguage:vue"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vue-i18n-op.openTranslatePane",
+        "title": "打开翻译面板",
+        "category": "vue-i18n-op",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "vue-i18n-op.replaceWith",
+        "title": "替换当前文件",
+        "category": "vue-i18n-op"
+      },
+      {
+        "command": "vue-i18n-op.setLocaleDir",
+        "title": "设置i18n文件目录",
+        "category": "vue-i18n-op"
+      }
+    ],
+    "keybindings": [],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "vue-i18n-op.openTranslatePane",
+          "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
+        },
+        {
+          "command": "vue-i18n-op.replaceWith",
+          "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "vue-i18n-op.openTranslatePane",
+          "group": "navigation",
+          "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
+        },
+        {
+          "command": "vue-i18n-op.replaceWith",
+          "group": "navigation",
+          "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "vue-i18n-op.openTranslatePane",
+          "group": "navigation",
+          "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "vue-i18n-op",
+      "properties": {
+        "vue-i18n-op.localeDir": {
+          "type": "string",
+          "default": "",
+          "description": "设置i18n文件目录"
+        },
+        "vue-i18n-op.localeFunName": {
+          "type": "string",
+          "default": "",
+          "description": "设置i18n插值函数名（例如i18n.t）"
+        },
+        "vue-i18n-op.vueLocaleFunName": {
+          "type": "string",
+          "default": "",
+          "description": "设置vue文件的i18n插值函数名（例如$t）"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "webview:dev": "vite --config ./src/webview/vite.config.ts",
+    "webview:build": "vite build --watch --config ./src/webview/vite.config.ts"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.25.1",
+    "@babel/core": "^7.18.5",
+    "@babel/generator": "^7.18.7",
+    "@babel/parser": "^7.18.5",
+    "@babel/template": "^7.16.7",
+    "@babel/traverse": "^7.18.5",
+    "@babel/types": "^7.18.4",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__traverse": "^7.17.1",
+    "@types/glob": "^7.2.0",
+    "@types/lodash": "^4.14.182",
+    "@types/mocha": "^9.1.0",
+    "@types/node": "14.x",
+    "@types/vscode": "^1.54.0",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "@vitejs/plugin-vue": "^2.3.3",
+    "@vscode/test-electron": "^2.1.2",
+    "eslint": "^8.9.0",
+    "glob": "^7.2.0",
+    "less": "^4.1.3",
+    "mocha": "^9.2.1",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "vite": "^2.9.12",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dom-serializer": "^2.0.0",
+    "fast-glob": "^3.2.11",
+    "gogocode": "^1.0.53",
+    "htmlparser2": "^8.0.1",
+    "lodash": "^4.17.21",
+    "pinia": "^2.0.14",
+    "vue": "^3.2.37"
+  },
+  "repository": {
+		"type": "git",
+		"url": "https://github.com/LuckyFroggy/vue-i18n-op"
+	},
+	"homepage": "https://github.com/LuckyFroggy/vue-i18n-op"
+}
