@@ -13,7 +13,7 @@
 * 支持(zh|en).(js|ts|json)配置文件的保存（自动识别）
 ### 如何使用
   **打开翻译面板**
-![](assets/open1.gif)
+![](assets/open.gif)
   **设置i18n文件目录**
 ![](assets/set.gif)
   **保存翻译**
