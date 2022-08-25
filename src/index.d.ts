@@ -1,5 +1,3 @@
-import type { Position } from 'vscode'
-
 export type MessageType = 'loaded' | 'translate' | 'translateAll' | 'save'
 export interface Message {
     type: MessageType

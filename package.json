@@ -13,8 +13,8 @@
   ],
   "icon": "assets/icon-vue-i18n-op.png",
   "activationEvents": [
-		"onLanguage:javascript",
-		"onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
     "onLanguage:vue"
   ],
   "main": "./dist/extension.js",
@@ -143,8 +143,8 @@
     "vue": "^3.2.37"
   },
   "repository": {
-		"type": "git",
-		"url": "https://github.com/LuckyFroggy/vue-i18n-op"
-	},
-	"homepage": "https://github.com/LuckyFroggy/vue-i18n-op"
+    "type": "git",
+    "url": "https://github.com/LuckyFroggy/vue-i18n-op"
+  },
+  "homepage": "https://github.com/LuckyFroggy/vue-i18n-op"
 }

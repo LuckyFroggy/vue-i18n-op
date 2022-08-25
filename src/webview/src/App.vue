@@ -82,7 +82,7 @@ function translateAll() {
 function save() {
     postMessage('save', { wordList: wordList.value })
 }
-function ignore(index) {
+function ignore(index: number) {
     wordList.value.splice(index, 1)
 }
 function postMessage(type: MessageType, data = {}) {

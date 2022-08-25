@@ -13,7 +13,10 @@ import {
     baseParse,
 } from '@vue/compiler-core'
 import type { TagType } from '../..'
+import type { ExtractorWordObject } from './base'
 import Extractor from './base'
+import _ from 'lodash'
+import { window } from 'vscode'
 // export declare const enum NodeTypes {
 //     ROOT = 0,
 //     ELEMENT = 1,
@@ -73,8 +76,6 @@ export default class VueExtractor extends Extractor {
         catch (error) {
             console.log('error=>', error)
         }
-
-        console.log('this.result=>', this.result)
         this.result.pureWords = [...new Set(this.result.pureWords)]
         // this.traverse(ast)
         return this.result
@@ -104,12 +105,16 @@ export default class VueExtractor extends Extractor {
             },
             onError: e => {
                 console.log('e=>', e)
+                if (e.message) {
+                    const message = `${ e.message}${e.loc?.start?.line ? ` at line:${ e.loc?.start?.line}` : ''}`
+                    message && window.showErrorMessage(message)
+                }
             },
         })
     }
 
     private insertTagGroup(node: ElementNode) {
-        if (!Object.prototype.hasOwnProperty.call(this.tagGroup, node.tag))
+        if (!_.has(this.tagGroup, node.tag))
             return false
         const tag = node.tag as TagType
         this.tagGroup[tag].push(node)
@@ -123,7 +128,7 @@ export default class VueExtractor extends Extractor {
             if (cnode.type === NodeTypes.ELEMENT)
                 await this.traverseTemplate(cnode)
             if (cnode.type === NodeTypes.TEXT) {
-                const params: any = {
+                const params: ExtractorWordObject = {
                     type: 'vue-template-text',
                     offset: {
                         start: loc.start.offset,
@@ -143,7 +148,7 @@ export default class VueExtractor extends Extractor {
             if (cnode.type === NodeTypes.INTERPOLATION) {
                 // INTERPOLATION
                 if (cnode.content.type === NodeTypes.SIMPLE_EXPRESSION) {
-                    const params: any = {
+                    const params: ExtractorWordObject = {
                         type: 'vue-template-interpolation',
                         fullText: loc.source,
                         offset: {
@@ -219,16 +224,16 @@ export default class VueExtractor extends Extractor {
                         return
                     if (!start || !end || !extra)
                         return
-                    const params = {
+                    const params: ExtractorWordObject = {
                         type: 'vue-script-string',
-                        isSetup,
-                        isGlobal,
                         offset: {
                             start: offset + start,
                             end: offset + end,
                         },
                         text: value,
-                        source: extra.raw,
+                        source: extra.raw as string,
+                        isSetup,
+                        isGlobal,
                     }
                     if (this.isExistChinese(value)) {
                         this.result.words.push(params)
@@ -236,23 +241,22 @@ export default class VueExtractor extends Extractor {
                     }
                 },
                 TemplateElement: (path) => {
-                    console.log('TemplateElement-path=>', path)
                     const { value, start, end } = path.node
                     const isGlobal = !path.findParent((path) => path.isExportDefaultDeclaration()) // 查找是否是export default模块中，是的话加this.，否则不加
                     if (path.findParent(p => p.isImportDeclaration()))
                         return
                     if (!start || !end)
                         return
-                    const params = {
+                    const params: ExtractorWordObject = {
                         type: 'vue-script-template',
-                        isSetup,
-                        isGlobal,
                         offset: {
                             start: offset + start,
                             end: offset + end,
                         },
                         text: value.raw,
                         source: value.raw,
+                        isSetup,
+                        isGlobal,
                     }
                     if (this.isExistChinese(value.raw)) {
                         this.result.words.push(params)
@@ -270,15 +274,15 @@ export default class VueExtractor extends Extractor {
             if (type === NodeTypes.ATTRIBUTE) {
                 // ATTRIBUTE
                 if (prop.value?.type === NodeTypes.TEXT) {
-                    const params = {
+                    const params: ExtractorWordObject = {
                         type: 'vue-attribute-text',
-                        attrName: prop.name,
                         offset: {
                             start: loc.start.offset,
                             end: loc.end.offset,
                         },
                         text: prop.value?.content,
                         source: prop.value?.loc.source,
+                        attrName: prop.name,
                     }
                     if (this.isExistChinese(prop.value?.content)) {
                         this.result.words.push(params)
@@ -290,7 +294,7 @@ export default class VueExtractor extends Extractor {
                 // DIRECTIVE
                 if (prop.exp?.type === NodeTypes.SIMPLE_EXPRESSION) {
                     const { content } = prop.exp
-                    const params: any = {
+                    const params: ExtractorWordObject = {
                         type: 'vue-directive-text',
                         fullText: loc.source,
                         offset: {

@@ -6,8 +6,8 @@ import TranslatePane from '../core/TranslatePane'
 import LocaleDir from '../core/LocaleDir'
 export default class Commands {
     static register(context: ExtensionContext): void {
-        commands.registerCommand(`${global.EXTENSION_NAME}.setLocaleDir`, () => LocaleDir.set())
-        commands.registerCommand(`${global.EXTENSION_NAME}.openTranslatePane`, (uri: Uri) => TranslatePane.open(uri))
-        commands.registerCommand(`${global.EXTENSION_NAME}.replaceWith`, () => CurrentFile.replaceWith())
+        context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.setLocaleDir`, () => LocaleDir.set()))
+        context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.openTranslatePane`, (uri: Uri) => TranslatePane.open(uri)))
+        context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.replaceWith`, () => CurrentFile.replaceWith()))
     }
 }
