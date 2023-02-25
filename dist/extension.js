@@ -65,9 +65,9 @@ const TranslatePane_1 = __importDefault(__webpack_require__(285));
 const LocaleDir_1 = __importDefault(__webpack_require__(200));
 class Commands {
     static register(context) {
-        vscode_1.commands.registerCommand(`${global.EXTENSION_NAME}.setLocaleDir`, () => LocaleDir_1.default.set());
-        vscode_1.commands.registerCommand(`${global.EXTENSION_NAME}.openTranslatePane`, (uri) => TranslatePane_1.default.open(uri));
-        vscode_1.commands.registerCommand(`${global.EXTENSION_NAME}.replaceWith`, () => CurrentFile_1.default.replaceWith());
+        context.subscriptions.push(vscode_1.commands.registerCommand(`${global.EXTENSION_NAME}.setLocaleDir`, () => LocaleDir_1.default.set()));
+        context.subscriptions.push(vscode_1.commands.registerCommand(`${global.EXTENSION_NAME}.openTranslatePane`, (uri) => TranslatePane_1.default.open(uri)));
+        context.subscriptions.push(vscode_1.commands.registerCommand(`${global.EXTENSION_NAME}.replaceWith`, () => CurrentFile_1.default.replaceWith()));
     }
 }
 exports["default"] = Commands;
@@ -199,7 +199,6 @@ class JSExtractor extends base_1.default {
                 'decorators-legacy',
             ],
         });
-        console.log('ast===>', ast);
         (0, traverse_1.default)(ast, {
             StringLiteral: (path) => {
                 const { value, start, end, extra } = path.node;
@@ -222,7 +221,6 @@ class JSExtractor extends base_1.default {
                 }
             },
             TemplateElement: (path) => {
-                console.log('TemplateElement-path=>', path);
                 const { value, start, end } = path.node;
                 if (path.findParent(p => p.isImportDeclaration()))
                     return;
@@ -239,11 +237,10 @@ class JSExtractor extends base_1.default {
                 };
                 if (this.isExistChinese(value.raw)) {
                     this.result.words.push(params);
-                    !this.result.pureWords.includes(value) && this.result.pureWords.push(value.raw);
+                    !this.result.pureWords.includes(value.raw) && this.result.pureWords.push(value.raw);
                 }
             },
         });
-        console.log('this.result=>', this.result);
         this.result.pureWords = [...new Set(this.result.pureWords)];
         return this.result;
     }
@@ -51724,6 +51721,8 @@ const parser_1 = __webpack_require__(8);
 const traverse_1 = __importDefault(__webpack_require__(9));
 const compiler_core_1 = __webpack_require__(183);
 const base_1 = __importDefault(__webpack_require__(180));
+const lodash_1 = __importDefault(__webpack_require__(198));
+const vscode_1 = __webpack_require__(5);
 // export declare const enum NodeTypes {
 //     ROOT = 0,
 //     ELEMENT = 1,
@@ -51779,7 +51778,6 @@ class VueExtractor extends base_1.default {
         catch (error) {
             console.log('error=>', error);
         }
-        console.log('this.result=>', this.result);
         this.result.pureWords = [...new Set(this.result.pureWords)];
         // this.traverse(ast)
         return this.result;
@@ -51807,11 +51805,15 @@ class VueExtractor extends base_1.default {
             },
             onError: e => {
                 console.log('e=>', e);
+                if (e.message) {
+                    const message = `${e.message}${e.loc?.start?.line ? ` at line:${e.loc?.start?.line}` : ''}`;
+                    message && vscode_1.window.showErrorMessage(message);
+                }
             },
         });
     }
     insertTagGroup(node) {
-        if (!Object.prototype.hasOwnProperty.call(this.tagGroup, node.tag))
+        if (!lodash_1.default.has(this.tagGroup, node.tag))
             return false;
         const tag = node.tag;
         this.tagGroup[tag].push(node);
@@ -51919,14 +51921,14 @@ class VueExtractor extends base_1.default {
                         return;
                     const params = {
                         type: 'vue-script-string',
-                        isSetup,
-                        isGlobal,
                         offset: {
                             start: offset + start,
                             end: offset + end,
                         },
                         text: value,
                         source: extra.raw,
+                        isSetup,
+                        isGlobal,
                     };
                     if (this.isExistChinese(value)) {
                         this.result.words.push(params);
@@ -51934,7 +51936,6 @@ class VueExtractor extends base_1.default {
                     }
                 },
                 TemplateElement: (path) => {
-                    console.log('TemplateElement-path=>', path);
                     const { value, start, end } = path.node;
                     const isGlobal = !path.findParent((path) => path.isExportDefaultDeclaration()); // 查找是否是export default模块中，是的话加this.，否则不加
                     if (path.findParent(p => p.isImportDeclaration()))
@@ -51943,14 +51944,14 @@ class VueExtractor extends base_1.default {
                         return;
                     const params = {
                         type: 'vue-script-template',
-                        isSetup,
-                        isGlobal,
                         offset: {
                             start: offset + start,
                             end: offset + end,
                         },
                         text: value.raw,
                         source: value.raw,
+                        isSetup,
+                        isGlobal,
                     };
                     if (this.isExistChinese(value.raw)) {
                         this.result.words.push(params);
@@ -51968,13 +51969,13 @@ class VueExtractor extends base_1.default {
                 if (prop.value?.type === 2 /* NodeTypes.TEXT */) {
                     const params = {
                         type: 'vue-attribute-text',
-                        attrName: prop.name,
                         offset: {
                             start: loc.start.offset,
                             end: loc.end.offset,
                         },
                         text: prop.value?.content,
                         source: prop.value?.loc.source,
+                        attrName: prop.name,
                     };
                     if (this.isExistChinese(prop.value?.content)) {
                         this.result.words.push(params);
@@ -79471,16 +79472,19 @@ const LangParser_1 = __importDefault(__webpack_require__(281));
 class LocaleDir {
     static async set() {
         const dir = await this.pickDir();
+        console.log('dir=>', dir);
         await Config_1.default.set('localeDir', dir[0]);
     }
     static async pickDir() {
         const rootPath = vscode_1.workspace.workspaceFolders?.[0]?.uri?.fsPath;
+        console.log('rootPath=>', rootPath);
         if (!rootPath)
             return [];
         const result = await vscode_1.window.showOpenDialog({
             defaultUri: vscode_1.Uri.file(rootPath),
             canSelectFolders: true,
         });
+        console.log('result=>', result);
         if (!result)
             return [];
         return result.map(item => {

@@ -3,6 +3,7 @@ import traverse from '@babel/traverse'
 import { readFileSync } from 'fs'
 import { regExpExistChinese } from '../../utils'
 import CurrentFile from '../CurrentFile'
+import type { ExtractorWordObject } from './base'
 import Extractor from './base'
 
 export default class JSExtractor extends Extractor {
@@ -19,7 +20,6 @@ export default class JSExtractor extends Extractor {
                 'decorators-legacy',
             ],
         })
-        console.log('ast===>', ast)
 
         traverse(ast, {
             StringLiteral: (path) => {
@@ -28,14 +28,14 @@ export default class JSExtractor extends Extractor {
                     return
                 if (!start || !end || !extra)
                     return
-                const params = {
+                const params: ExtractorWordObject = {
                     type: 'script-string',
                     offset: {
                         start,
                         end,
                     },
                     text: value,
-                    source: extra.raw,
+                    source: extra.raw as string,
                 }
                 if (this.isExistChinese(value)) {
                     this.result.words.push(params)
@@ -43,13 +43,12 @@ export default class JSExtractor extends Extractor {
                 }
             },
             TemplateElement: (path) => {
-                console.log('TemplateElement-path=>', path)
                 const { value, start, end } = path.node
                 if (path.findParent(p => p.isImportDeclaration()))
                     return
                 if (!start || !end)
                     return
-                const params = {
+                const params: ExtractorWordObject = {
                     type: 'script-template',
                     offset: {
                         start,
@@ -60,11 +59,10 @@ export default class JSExtractor extends Extractor {
                 }
                 if (this.isExistChinese(value.raw)) {
                     this.result.words.push(params)
-                    !this.result.pureWords.includes(value) && this.result.pureWords.push(value.raw)
+                    !this.result.pureWords.includes(value.raw) && this.result.pureWords.push(value.raw)
                 }
             },
         })
-        console.log('this.result=>', this.result)
         this.result.pureWords = [...new Set(this.result.pureWords)]
         return this.result
     }
