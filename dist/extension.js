@@ -87132,14 +87132,14 @@ class TranslatePane {
         });
     }
     static async callTranslateApi(text) {
-        const appid = "wwwwww";
-        const key = "xxxxx";
+        const appid = "ILoveSJL";
+        const key = "ILoveSJL";
         const salt = (new Date).getTime();
-        let from = "zh";
-        let to = "en";
-        let str1 = appid + text + salt + key;
-        var sign = crypto_js_1.default.MD5(str1).toString();
-        let params = {
+        const from = "zh";
+        const to = "en";
+        const str1 = appid + text + salt + key;
+        const sign = crypto_js_1.default.MD5(str1).toString();
+        const params = {
             q: text,
             appid,
             salt,
