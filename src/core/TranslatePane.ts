@@ -9,6 +9,7 @@ import { getHtmlForWebview } from '../utils/webview'
 import Config from './Config'
 import CurrentFile from './CurrentFile'
 import LocaleDir from './LocaleDir'
+import CryptoJS from 'crypto-js'
 export default class TranslatePane {
     static panel: WebviewPanel
     static uri: string
@@ -71,6 +72,8 @@ export default class TranslatePane {
         })
     }
 
+    /**
+     * 由于google翻译api因为政策原因停止服务，所以此方法暂时弃用
     static async translate(data: WordListItem) {
         this.callTranslateApi(data.lang.zh).then(res => {
             const { sentences = [] } = res?.data
@@ -103,15 +106,67 @@ export default class TranslatePane {
             this.postMessage('translateAll', { wordList })
         })
     }
+    static async callTranslateApi(text: string): Promise<AxiosResponse<any, any>> {
+        return axios.get(`${TRANSLATE_API}${encodeURI(text)}`)
+    }
+    */
 
     static save(data: { wordList: WordListItem[] }) {
         const { wordList = [] } = data
         LocaleDir.insert({ wordList })
     }
 
-    static async callTranslateApi(text: string): Promise<AxiosResponse<any, any>> {
-        return axios.get(`${TRANSLATE_API}${encodeURI(text)}`)
+    static async translate(data: WordListItem) {
+        this.callTranslateApi(data.lang.zh).then(res => {
+            const { trans_result = [] } = res?.data
+            trans_result[0]?.dst && (data.lang.en = trans_result[0]?.dst)
+            this.postMessage('translate', data)
+        })
     }
+    static async translateAll(data: { wordList: WordListItem[] }) {
+        const { wordList } = data
+        const APIs: Promise<AxiosResponse<any, any>>[] = []
+        wordList.forEach((item: WordListItem) => {
+            APIs.push(this.callTranslateApi(item.lang.zh))
+        })
+        Promise.allSettled && Promise.allSettled(APIs).then(res => {
+            res.forEach((item, index) => {
+                if (item.status === 'fulfilled') {
+                    const { trans_result = [] } = item?.value?.data
+                    console.log('item?.value=>',item?.value);
+                    trans_result[0]?.dst && (wordList[index].lang.en = trans_result[0]?.dst)
+                }
+            })
+            this.postMessage('translateAll', { wordList })
+        })
+    }
+    static async callTranslateApi(text: string): Promise<AxiosResponse<any, any>> {
+        const appid = "wwwwww"
+        const key = "xxxxx"
+        const salt = (new Date).getTime()
+        let from = "zh"
+        let to = "en"
+        let str1 = appid + text + salt + key;
+        var sign = CryptoJS.MD5(str1).toString();
+        let params = {
+            q: text,
+            appid,
+            salt,
+            from,
+            to,
+            sign,
+            dict:true
+        }
+        return axios({
+            method:'get',
+            url:'https://fanyi-api.baidu.com/api/trans/vip/translate',
+            headers:{
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params
+        })
+    }
+    
 
     static postMessage(type: any, data = {}) {
         this.panel.webview.postMessage({
