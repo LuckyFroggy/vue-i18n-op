@@ -3,7 +3,7 @@
   "displayName": "Vue I18n OP",
   "description": "一款针对Vue项目的进行快速国际化翻译与替换的插件🤳",
   "version": "1.0.0",
-  "publisher": "LuckyFroggy",
+  "publisher": "HappyFroggy",
   "engines": {
     "vscode": "^1.54.0"
   },
