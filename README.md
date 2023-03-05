@@ -1,11 +1,14 @@
 
 <center><img src="/assets/icon-vue-i18n-op.png" width="30%"></center>
 
- # <center> Vue I18n OP
-------
-<center>在开发过程中，频繁的人工翻译和替换中文真的很累有木有！😩</center>
-<center>此刻的你一定也和我有着相同的烦恼，才让我们在这里相遇！👨🏻‍🤝‍👨🏼</center>
-<center>这是一款辅助开发者快速编写与替换Vue I18n的工具🚀</center>
+ # <center> Vue I18n OP</center>
+
+<center>
+在开发过程中，频繁的人工翻译和替换中文真的很累有木有！😩
+此刻的你一定也和我有着相同的烦恼，才让我们在这里相遇！👨🏻‍🤝‍👨🏼
+这是一款辅助开发者快速编写与替换Vue I18n的工具🚀
+</center>
+
 ## 主要能力
 
 * **支持Vue/Vue3（Options API/组合式API）**
