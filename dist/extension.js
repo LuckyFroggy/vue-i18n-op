@@ -98,7 +98,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const path_1 = __webpack_require__(4);
 const vscode_1 = __webpack_require__(5);
 const Extractor_1 = __importDefault(__webpack_require__(6));
-const Replacer_1 = __importDefault(__webpack_require__(197));
+const Replacer_1 = __importDefault(__webpack_require__(198));
 class CurrentFile {
     static async getExtractedWords() {
         const extractor = (0, Extractor_1.default)();
@@ -51721,7 +51721,7 @@ const parser_1 = __webpack_require__(8);
 const traverse_1 = __importDefault(__webpack_require__(9));
 const compiler_core_1 = __webpack_require__(183);
 const base_1 = __importDefault(__webpack_require__(180));
-const lodash_1 = __importDefault(__webpack_require__(198));
+const lodash_1 = __importDefault(__webpack_require__(197));
 const vscode_1 = __webpack_require__(5);
 // export declare const enum NodeTypes {
 //     ROOT = 0,
@@ -62041,153 +62041,6 @@ exports.SourceNode = SourceNode;
 
 /***/ }),
 /* 197 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const lodash_1 = __importDefault(__webpack_require__(198));
-const vscode_1 = __webpack_require__(5);
-const Config_1 = __importDefault(__webpack_require__(199));
-const CurrentFile_1 = __importDefault(__webpack_require__(3));
-const LocaleDir_1 = __importDefault(__webpack_require__(200));
-class Replacer {
-    static async replaceWith() {
-        // 先判断是否设置了vue/js文件的i18n翻译函数名，没有的话弹出设置
-        // 获取待替换文本数组，遍历结果
-        if (!Config_1.default.localeFunName)
-            await this.setLocaleFunName('localeFunName');
-        if (!Config_1.default.vueLocaleFunName)
-            await this.setLocaleFunName('vueLocaleFunName');
-        if (!Config_1.default.localeFunName || !Config_1.default.vueLocaleFunName)
-            return;
-        const { words, pureWords } = await CurrentFile_1.default.getExtractedWords();
-        console.log('words=>', words, pureWords);
-        if (!Config_1.default.localeDir)
-            await LocaleDir_1.default.showSetNotification();
-        if (!pureWords.length)
-            return vscode_1.window.showInformationMessage('未识别到待替换文本！');
-        const keyOptions = await this.getKeyOptions(pureWords);
-        console.log('keyOptions===>', keyOptions);
-        const replaceList = [];
-        for (const item of words) {
-            const { type, offset } = item;
-            let replaceText = '';
-            switch (type) {
-                case 'script-string':
-                    if (lodash_1.default.has(keyOptions, item.text)) {
-                        replaceList.push({
-                            offset,
-                            replaceText: `${Config_1.default.localeFunName}('${keyOptions[item.text]}')`,
-                        });
-                    }
-                    break;
-                case 'script-template':
-                    if (lodash_1.default.has(keyOptions, item.text)) {
-                        replaceList.push({
-                            offset,
-                            replaceText: `\$\{${Config_1.default.localeFunName}('${keyOptions[item.text]}')\}`,
-                        });
-                    }
-                    break;
-                case 'vue-attribute-text':
-                    if (lodash_1.default.has(keyOptions, item.text)) {
-                        replaceList.push({
-                            offset,
-                            replaceText: `:${item.attrName}="${Config_1.default.vueLocaleFunName}('${keyOptions[item.text]}')"`,
-                        });
-                    }
-                    break;
-                case 'vue-directive-text':
-                case 'vue-template-interpolation':
-                    replaceText = item.fullText;
-                    for (const option of item.replaceTexts) {
-                        if (lodash_1.default.has(keyOptions, option.text)) {
-                            if (option.type === 'string')
-                                replaceText = replaceText.replace(option.source, `${Config_1.default.vueLocaleFunName}('${keyOptions[option.text]}')`);
-                            else if (option.type === 'template')
-                                replaceText = replaceText.replace(option.source, `\$\{${Config_1.default.vueLocaleFunName}('${keyOptions[option.text]}')\}`);
-                        }
-                    }
-                    console.log('replaceTextreplaceTextreplaceText=>', replaceText);
-                    replaceList.push({
-                        offset,
-                        replaceText,
-                    });
-                    break;
-                case 'vue-template-text':
-                    if (lodash_1.default.has(keyOptions, item.text)) {
-                        replaceList.push({
-                            offset,
-                            replaceText: item.source.replace(item.text, `\{\{${Config_1.default.vueLocaleFunName}('${keyOptions[item.text]}')\}\}`),
-                        });
-                    }
-                    break;
-                case 'vue-script-string':
-                    if (lodash_1.default.has(keyOptions, item.text)) {
-                        console.log('item=>', item);
-                        let prefix = '';
-                        if (!item.isGlobal && !item.isSetup)
-                            prefix = 'this.';
-                        replaceList.push({
-                            offset,
-                            replaceText: `${prefix}${item.isGlobal ? Config_1.default.localeFunName : Config_1.default.vueLocaleFunName}('${keyOptions[item.text]}')`,
-                        });
-                    }
-                    break;
-                case 'vue-script-template':
-                    if (lodash_1.default.has(keyOptions, item.text)) {
-                        let prefix = '';
-                        if (!item.isGlobal && !item.isSetup)
-                            prefix = 'this.';
-                        replaceList.push({
-                            offset,
-                            replaceText: `\$\{${prefix}${item.isGlobal ? Config_1.default.localeFunName : Config_1.default.vueLocaleFunName}('${keyOptions[item.text]}')\}`,
-                        });
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        this.replace(replaceList);
-    }
-    static async replace(replaceList) {
-        const workspaceEdit = new vscode_1.WorkspaceEdit();
-        for (const item of replaceList) {
-            const { offset: { start, end }, replaceText } = item;
-            const range = new vscode_1.Range(vscode_1.window.activeTextEditor.document.positionAt(start), vscode_1.window.activeTextEditor.document.positionAt(end));
-            workspaceEdit.replace(CurrentFile_1.default.getUri, range, replaceText);
-        }
-        await vscode_1.workspace.applyEdit(workspaceEdit);
-    }
-    static async getKeyOptions(words) {
-        const result = {};
-        for (const word of words) {
-            const keys = await LocaleDir_1.default.findMatchKeys(word);
-            // console.log('word=>', word, keys)
-            if (keys.length === 1)
-                result[word] = keys[0];
-            if (keys.length > 1) {
-                const key = await vscode_1.window.showQuickPick(keys, { placeHolder: `选择一个key以替换【${word}】` });
-                key && (result[word] = key);
-            }
-        }
-        return result;
-    }
-    static async setLocaleFunName(type) {
-        const res = await vscode_1.window.showInputBox({ placeHolder: type === 'vueLocaleFunName' ? '设置vue文件的i18n插值函数名（例如$t）' : '设置i18n插值函数名（例如i18n.t）' });
-        res && await Config_1.default.set(type, res);
-    }
-}
-exports["default"] = Replacer;
-
-
-/***/ }),
-/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* module decorator */ module = __webpack_require__.nmd(module);
@@ -79395,6 +79248,153 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
+/* 198 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const lodash_1 = __importDefault(__webpack_require__(197));
+const vscode_1 = __webpack_require__(5);
+const Config_1 = __importDefault(__webpack_require__(199));
+const CurrentFile_1 = __importDefault(__webpack_require__(3));
+const LocaleDir_1 = __importDefault(__webpack_require__(200));
+class Replacer {
+    static async replaceWith() {
+        // 先判断是否设置了vue/js文件的i18n翻译函数名，没有的话弹出设置
+        // 获取待替换文本数组，遍历结果
+        if (!Config_1.default.localeFunName)
+            await this.setLocaleFunName('localeFunName');
+        if (!Config_1.default.vueLocaleFunName)
+            await this.setLocaleFunName('vueLocaleFunName');
+        if (!Config_1.default.localeFunName || !Config_1.default.vueLocaleFunName)
+            return;
+        const { words, pureWords } = await CurrentFile_1.default.getExtractedWords();
+        console.log('words=>', words, pureWords);
+        if (!Config_1.default.localeDir)
+            await LocaleDir_1.default.showSetNotification();
+        if (!pureWords.length)
+            return vscode_1.window.showInformationMessage('未识别到待替换文本！');
+        const keyOptions = await this.getKeyOptions(pureWords);
+        console.log('keyOptions===>', keyOptions);
+        const replaceList = [];
+        for (const item of words) {
+            const { type, offset } = item;
+            let replaceText = '';
+            switch (type) {
+                case 'script-string':
+                    if (lodash_1.default.has(keyOptions, item.text)) {
+                        replaceList.push({
+                            offset,
+                            replaceText: `${Config_1.default.localeFunName}('${keyOptions[item.text]}')`,
+                        });
+                    }
+                    break;
+                case 'script-template':
+                    if (lodash_1.default.has(keyOptions, item.text)) {
+                        replaceList.push({
+                            offset,
+                            replaceText: `\$\{${Config_1.default.localeFunName}('${keyOptions[item.text]}')\}`,
+                        });
+                    }
+                    break;
+                case 'vue-attribute-text':
+                    if (lodash_1.default.has(keyOptions, item.text)) {
+                        replaceList.push({
+                            offset,
+                            replaceText: `:${item.attrName}="${Config_1.default.vueLocaleFunName}('${keyOptions[item.text]}')"`,
+                        });
+                    }
+                    break;
+                case 'vue-directive-text':
+                case 'vue-template-interpolation':
+                    replaceText = item.fullText;
+                    for (const option of item.replaceTexts) {
+                        if (lodash_1.default.has(keyOptions, option.text)) {
+                            if (option.type === 'string')
+                                replaceText = replaceText.replace(option.source, `${Config_1.default.vueLocaleFunName}('${keyOptions[option.text]}')`);
+                            else if (option.type === 'template')
+                                replaceText = replaceText.replace(option.source, `\$\{${Config_1.default.vueLocaleFunName}('${keyOptions[option.text]}')\}`);
+                        }
+                    }
+                    console.log('replaceTextreplaceTextreplaceText=>', replaceText);
+                    replaceList.push({
+                        offset,
+                        replaceText,
+                    });
+                    break;
+                case 'vue-template-text':
+                    if (lodash_1.default.has(keyOptions, item.text)) {
+                        replaceList.push({
+                            offset,
+                            replaceText: item.source.replace(item.text, `\{\{${Config_1.default.vueLocaleFunName}('${keyOptions[item.text]}')\}\}`),
+                        });
+                    }
+                    break;
+                case 'vue-script-string':
+                    if (lodash_1.default.has(keyOptions, item.text)) {
+                        console.log('item=>', item);
+                        let prefix = '';
+                        if (!item.isGlobal && !item.isSetup)
+                            prefix = 'this.';
+                        replaceList.push({
+                            offset,
+                            replaceText: `${prefix}${item.isGlobal ? Config_1.default.localeFunName : Config_1.default.vueLocaleFunName}('${keyOptions[item.text]}')`,
+                        });
+                    }
+                    break;
+                case 'vue-script-template':
+                    if (lodash_1.default.has(keyOptions, item.text)) {
+                        let prefix = '';
+                        if (!item.isGlobal && !item.isSetup)
+                            prefix = 'this.';
+                        replaceList.push({
+                            offset,
+                            replaceText: `\$\{${prefix}${item.isGlobal ? Config_1.default.localeFunName : Config_1.default.vueLocaleFunName}('${keyOptions[item.text]}')\}`,
+                        });
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        this.replace(replaceList);
+    }
+    static async replace(replaceList) {
+        const workspaceEdit = new vscode_1.WorkspaceEdit();
+        for (const item of replaceList) {
+            const { offset: { start, end }, replaceText } = item;
+            const range = new vscode_1.Range(vscode_1.window.activeTextEditor.document.positionAt(start), vscode_1.window.activeTextEditor.document.positionAt(end));
+            workspaceEdit.replace(CurrentFile_1.default.getUri, range, replaceText);
+        }
+        await vscode_1.workspace.applyEdit(workspaceEdit);
+    }
+    static async getKeyOptions(words) {
+        const result = {};
+        for (const word of words) {
+            const keys = await LocaleDir_1.default.findMatchKeys(word);
+            // console.log('word=>', word, keys)
+            if (keys.length === 1)
+                result[word] = keys[0];
+            if (keys.length > 1) {
+                const key = await vscode_1.window.showQuickPick(keys, { placeHolder: `选择一个key以替换【${word}】` });
+                key && (result[word] = key);
+            }
+        }
+        return result;
+    }
+    static async setLocaleFunName(type) {
+        const res = await vscode_1.window.showInputBox({ placeHolder: type === 'vueLocaleFunName' ? '设置vue文件的i18n插值函数名（例如$t）' : '设置i18n插值函数名（例如i18n.t）' });
+        res && await Config_1.default.set(type, res);
+    }
+}
+exports["default"] = Replacer;
+
+
+/***/ }),
 /* 199 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -87132,8 +87132,8 @@ class TranslatePane {
         });
     }
     static async callTranslateApi(text) {
-        const appid = "ILoveSJL";
-        const key = "ILoveSJL";
+        const appid = "20230225001576249";
+        const key = "EpkaC8slQM3AhDZwxWtw";
         const salt = (new Date).getTime();
         const from = "zh";
         const to = "en";

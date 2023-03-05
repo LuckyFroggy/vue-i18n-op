@@ -141,8 +141,8 @@ export default class TranslatePane {
         })
     }
     static async callTranslateApi(text: string): Promise<AxiosResponse<any, any>> {
-        const appid = "ILoveSJL"
-        const key = "ILoveSJL"
+        const appid = "20230225001576249"
+        const key = "EpkaC8slQM3AhDZwxWtw"
         const salt = (new Date).getTime()
         const from = "zh"
         const to = "en"

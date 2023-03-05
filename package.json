@@ -1,11 +1,11 @@
 {
   "name": "vue-i18n-op",
   "displayName": "Vue I18n OP",
-  "description": "一款针对Vue项目的进行快速国际化翻译与替换的插件🤳",
+  "description": "一款辅助开发者快速编写与替换Vue I18n的插件🤳",
   "version": "1.0.0",
   "publisher": "HappyFroggy",
   "engines": {
-    "vscode": "^1.54.0"
+    "vscode": "^1.27.0"
   },
   "license": "MIT",
   "categories": [
