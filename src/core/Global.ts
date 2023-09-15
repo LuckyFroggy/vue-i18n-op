@@ -9,7 +9,7 @@ export default class Global {
     static async getAllChineseList(uri:Uri) {
         
         
-        const cwd = uri.path
+        const cwd = path.resolve(uri.fsPath) 
         let childrenPaths = await fg('**', { cwd })
         let result:any = {
             totalChinese:0,
