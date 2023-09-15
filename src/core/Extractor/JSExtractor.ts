@@ -7,17 +7,17 @@ import type { ExtractorWordObject } from './base'
 import Extractor from './base'
 
 export default class JSExtractor extends Extractor {
-    async extract() {
+    async extract(code=CurrentFile.text,filepath=CurrentFile.fsPath) {
         this.result = {
             pureWords: [],
             words: [],
         }
-        const code = CurrentFile.text
+        // const code = CurrentFile.text
         const ast = parse(code, {
             sourceType: 'unambiguous',
             plugins: [
                 'typescript',
-                'decorators-legacy',
+                'decorators-legacy'
             ],
         })
 

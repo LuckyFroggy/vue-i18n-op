@@ -50,7 +50,7 @@ import { window } from 'vscode'
 export default class VueExtractor extends Extractor {
     private tagGroup!: Record<TagType, ElementNode[]>
 
-    async extract() {
+    async extract(code=CurrentFile.text,filepath=CurrentFile.fsPath) {
         try {
             this.result = {
                 pureWords: [],
@@ -60,8 +60,8 @@ export default class VueExtractor extends Extractor {
                 template: [],
                 script: [],
             }
-            const code = CurrentFile.text
-            const ast = this.parse(code)
+            // const code = CurrentFile.text
+            const ast = this.parse(code,filepath)
             for (const node of ast.children) {
                 if (node.type !== NodeTypes.ELEMENT)
                     break
@@ -81,7 +81,7 @@ export default class VueExtractor extends Extractor {
         return this.result
     }
 
-    private parse(code: string) {
+    private parse(code: string,filepath:any) {
         return baseParse(code, {
             // there are no components at SFC parsing level
             isNativeTag: () => true,
@@ -106,7 +106,7 @@ export default class VueExtractor extends Extractor {
             onError: e => {
                 console.log('e=>', e)
                 if (e.message) {
-                    const message = `${ e.message}${e.loc?.start?.line ? ` at line:${ e.loc?.start?.line}` : ''}`
+                    const message = `文件：${filepath}，${ e.message}${e.loc?.start?.line ? ` at line:${ e.loc?.start?.line}` : ''}`
                     message && window.showErrorMessage(message)
                 }
             },

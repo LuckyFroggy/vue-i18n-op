@@ -94,7 +94,12 @@ export default class LocaleDir {
     static async getChildrenPaths() {
         if (!Config.localeDir)
             return []
+            console.log('Config.rootDir=>',Config.rootDir);
+            console.log('Config.localeDir=>',Config.localeDir);
+            
+            
         const cwd = path.resolve(Config.rootDir, Config.localeDir)
+        console.log('cwd=>',cwd);
         return await fg('**', { cwd })
     }
 

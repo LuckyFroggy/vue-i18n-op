@@ -2,7 +2,7 @@
   "name": "vue-i18n-op",
   "displayName": "Vue I18n OP",
   "description": "一款辅助开发者快速编写与替换Vue I18n的插件🤳",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "HappyFroggy",
   "engines": {
     "vscode": "^1.54.0"
@@ -35,6 +35,11 @@
         "command": "vue-i18n-op.setLocaleDir",
         "title": "设置i18n文件目录",
         "category": "vue-i18n-op"
+      },
+      {
+        "command": "vue-i18n-op.getAllChineseList",
+        "title": "获取该目录下所有中文文本",
+        "category": "vue-i18n-op"
       }
     ],
     "keybindings": [],
@@ -47,6 +52,13 @@
         {
           "command": "vue-i18n-op.replaceWith",
           "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
+        }
+      ],
+      "explorer/context":[
+        {
+          "command": "vue-i18n-op.getAllChineseList",
+          "group": "navigation",
+          "when": "explorerResourceIsFolder"
         }
       ],
       "editor/context": [

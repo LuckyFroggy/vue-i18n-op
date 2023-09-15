@@ -7,16 +7,16 @@ class Extractor {
     constructor() {
     }
 
-    strategy() {
+    strategy(extName:FileExt) {
         const strategy: Record<FileExt, VueExtractor | JSExtractor> = {
             '.vue': new VueExtractor(),
             '.js': new JSExtractor(),
             '.ts': new JSExtractor(),
         }
-        return strategy[CurrentFile.extName]
+        return strategy[extName]
     }
 }
-export default function extractor(): VueExtractor | JSExtractor {
+export default function extractor(extName=CurrentFile.extName as FileExt): VueExtractor | JSExtractor {
     const fun = new Extractor()
-    return fun.strategy()
+    return fun.strategy(extName)
 }
