@@ -18,19 +18,19 @@
                 <input type="text" class="word-form-input" v-model="item.key" />
               </section>
               <section class="word-form">
-                <span>en:</span>
-                <input
-                  type="text"
-                  class="word-form-input"
-                  v-model="item.lang.en"
-                />
-              </section>
-              <section class="word-form">
                 <span>zh:</span>
                 <input
                   type="text"
                   class="word-form-input"
                   v-model="item.lang.zh"
+                />
+              </section>
+              <section class="word-form">
+                <span>en:</span>
+                <input
+                  type="text"
+                  class="word-form-input"
+                  v-model="item.lang.en"
                 />
               </section>
             </div>

@@ -83,6 +83,9 @@ export default class VueExtractor extends Extractor {
 
     private parse(code: string,filepath:any) {
         return baseParse(code, {
+            isVoidTag:(tag)=>{
+                return tag === 'input' || tag === 'img' || tag === 'br' || tag === 'hr'
+            },
             // there are no components at SFC parsing level
             isNativeTag: () => true,
             // preserve all whitespaces
