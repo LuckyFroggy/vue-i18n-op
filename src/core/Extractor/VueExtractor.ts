@@ -64,7 +64,7 @@ export default class VueExtractor extends Extractor {
             const ast = this.parse(code,filepath)
             for (const node of ast.children) {
                 if (node.type !== NodeTypes.ELEMENT)
-                    break
+                    continue
                 this.insertTagGroup(node)
             }
             for (const node of this.tagGroup.template)
