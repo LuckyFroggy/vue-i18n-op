@@ -10,8 +10,9 @@ import { randomString } from '../utils'
 import { VueTemplateInterpolation } from './Extractor/base'
 export default class Global {
     static async exportAllChineseList(uri:Uri) {
-        let lastSrc = uri.fsPath.split('/').pop()
+        
         const cwd = path.resolve(uri.fsPath) 
+        let lastSrc = cwd.split('/').pop()
         let childrenPaths = await fg('**', { cwd })
         let chineseTextList:string[] = []
         let data = [
