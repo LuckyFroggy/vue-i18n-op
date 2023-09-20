@@ -5,6 +5,7 @@ import { regExpExistChinese } from '../../utils'
 import CurrentFile from '../CurrentFile'
 import type { ExtractorWordObject } from './base'
 import Extractor from './base'
+import { isCallExpression, isIdentifier, isMemberExpression } from '@babel/types'
 
 export default class JSExtractor extends Extractor {
     async extract(code=CurrentFile.text,filepath=CurrentFile.fsPath) {
@@ -24,8 +25,11 @@ export default class JSExtractor extends Extractor {
         traverse(ast, {
             StringLiteral: (path) => {
                 const { value, start, end, extra } = path.node
+                // 忽略导入链接中的中文提取
                 if (path.findParent(p => p.isImportDeclaration()))
                     return
+                // 忽略console中中文提取
+                if(path.findParent( p=> isCallExpression(p.node) && isMemberExpression(p.node.callee) && isIdentifier(p.node.callee.object) && p.node.callee.object.name=='console')) return
                 if (!start || !end || !extra)
                     return
                 const params: ExtractorWordObject = {

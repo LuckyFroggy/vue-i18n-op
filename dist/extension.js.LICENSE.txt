@@ -47,9 +47,15 @@
  * Released under the MIT License.
  */
 
+/*! cpexcel.js (C) 2013-present SheetJS -- http://sheetjs.com */
+
+/*! cputils.js (C) 2013-present SheetJS -- http://sheetjs.com */
+
 /*! queue-microtask. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
 /*! run-parallel. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/*! sheetjs (C) 2013-present SheetJS -- http://sheetjs.com */
 
 /**
  * @license

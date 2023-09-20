@@ -1,4 +1,4 @@
-import { isExportDefaultDeclaration, isIdentifier, isObjectExpression, isObjectMethod } from '@babel/types'
+import { isCallExpression, isExportDefaultDeclaration, isIdentifier, isMemberExpression, isObjectExpression, isObjectMethod } from '@babel/types'
 import CurrentFile from '../CurrentFile'
 import { regExpExistChinese } from '../../utils'
 import { parse } from '@babel/parser'
@@ -223,6 +223,7 @@ export default class VueExtractor extends Extractor {
                     const isGlobal = !path.findParent((path) => path.isExportDefaultDeclaration()) // 查找是否是export default模块中，是的话加this.，否则不加
                     if (path.findParent(p => p.isImportDeclaration()))
                         return
+                    if(path.findParent( p=> isCallExpression(p.node) && isMemberExpression(p.node.callee) && isIdentifier(p.node.callee.object) && p.node.callee.object.name=='console')) return
                     if (!start || !end || !extra)
                         return
                     const params: ExtractorWordObject = {
