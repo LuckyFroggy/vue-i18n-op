@@ -10,6 +10,6 @@ export default class Commands {
         context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.setLocaleDir`, () => LocaleDir.set()))
         context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.openTranslatePane`, (uri: Uri) => TranslatePane.open(uri)))
         context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.replaceWith`, () => CurrentFile.replaceWith()))
-        context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.getAllChineseList`, (uri: Uri) => Global.getAllChineseList(uri)))
+        context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.exportAllChineseList`, (uri: Uri) => Global.exportAllChineseList(uri)))
     }
 }

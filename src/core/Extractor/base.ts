@@ -30,6 +30,7 @@ export interface VueTemplateInterpolation extends BaseExtractorWordObject {
     type: 'vue-template-interpolation'
     fullText: string
     replaceTexts: replaceText[]
+    text?: string
 }
 
 export interface VueScriptString extends BaseExtractorWordObject {
@@ -51,6 +52,7 @@ export interface VueDirectiveText extends BaseExtractorWordObject {
     type: 'vue-directive-text'
     fullText: string
     replaceTexts: replaceText[]
+    text?: string
 }
 
 export interface ScriptString extends BaseExtractorWordObject {

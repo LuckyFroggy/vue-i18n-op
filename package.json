@@ -37,7 +37,7 @@
         "category": "vue-i18n-op"
       },
       {
-        "command": "vue-i18n-op.getAllChineseList",
+        "command": "vue-i18n-op.exportAllChineseList",
         "title": "导出该目录下所有中文",
         "category": "vue-i18n-op"
       }
@@ -54,9 +54,9 @@
           "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
         }
       ],
-      "explorer/context":[
+      "explorer/context": [
         {
-          "command": "vue-i18n-op.getAllChineseList",
+          "command": "vue-i18n-op.exportAllChineseList",
           "group": "navigation",
           "when": "explorerResourceIsFolder"
         }
@@ -98,6 +98,11 @@
           "type": "string",
           "default": "",
           "description": "设置vue文件的i18n插值函数名（例如$t）"
+        },
+        "vue-i18n-op.relativeI18nPath": {
+          "type": "string",
+          "default": "",
+          "description": "设置导入i18n时的相对路径（例如:'@/lang/index.js'），用于在文件中生成import i18n from 'i18n相对路径'"
         }
       }
     }
@@ -153,6 +158,7 @@
     "gogocode": "^1.0.53",
     "htmlparser2": "^8.0.1",
     "lodash": "^4.17.21",
+    "node-xlsx": "^0.23.0",
     "pinia": "^2.0.14",
     "vue": "^3.2.37"
   },

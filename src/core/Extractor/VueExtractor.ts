@@ -86,15 +86,10 @@ export default class VueExtractor extends Extractor {
             isVoidTag:(tag)=>{
                 return tag === 'input' || tag === 'img' || tag === 'br' || tag === 'hr'
             },
-            // there are no components at SFC parsing level
             isNativeTag: () => true,
-            // preserve all whitespaces
             isPreTag: () => true,
             getTextMode: ({ tag, props }, parent) => {
-                // all top level elements except <template> are parsed as raw text
-                // containers
                 if ((!parent && tag !== 'template')
-                    // <template lang="xxx"> should also be treated as raw text
                     || (tag === 'template'
                         && props.some(p => p.type === 6
                             && /* ATTRIBUTE */ p.name === 'lang'
@@ -125,9 +120,12 @@ export default class VueExtractor extends Extractor {
 
     private async traverseTemplate(node: ElementNode) {
         const { children, props } = node
+        console.log('node=>',node);
         await this.visitorTemplateProps(props)
         for (const cnode of children) {
             const { loc } = cnode
+            
+            
             if (cnode.type === NodeTypes.ELEMENT)
                 await this.traverseTemplate(cnode)
             if (cnode.type === NodeTypes.TEXT) {

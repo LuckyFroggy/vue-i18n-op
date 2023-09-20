@@ -19,7 +19,6 @@ export default class CurrentFile {
     }
 
     static get getUri(): Uri {
-        console.log('window.activeTextEditor=>', window.activeTextEditor)
         return window.activeTextEditor?.document?.uri as Uri
     }
 

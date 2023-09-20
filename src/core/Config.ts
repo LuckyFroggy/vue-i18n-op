@@ -20,6 +20,10 @@ export default class Config {
         return this.getConfiguration<string>('localeFunName') ?? ''
     }
 
+    static get relativeI18nPath(): string {
+        return this.getConfiguration<string>('relativeI18nPath') ?? ''
+    }
+
     private static getConfiguration<T>(key: string): T | undefined {
         return workspace
             .getConfiguration(global.EXTENSION_NAME)
