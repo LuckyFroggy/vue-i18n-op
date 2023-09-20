@@ -87,7 +87,6 @@ export default class VueImporter extends Importer {
     }
 
     private async traverseScript(node: ElementNode) {
-        // console.log('traverseScript-node=>', node)
         for (const item of node.children) {
             const { source, start: { offset } } = item.loc
             const ast = parse(source, {

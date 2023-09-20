@@ -120,7 +120,6 @@ export default class VueExtractor extends Extractor {
 
     private async traverseTemplate(node: ElementNode) {
         const { children, props } = node
-        console.log('node=>',node);
         await this.visitorTemplateProps(props)
         for (const cnode of children) {
             const { loc } = cnode
@@ -193,7 +192,6 @@ export default class VueExtractor extends Extractor {
     }
 
     private async traverseScript(node: ElementNode) {
-        // console.log('traverseScript-node=>', node)
         let isSetup = node.props.some(prop => prop.name === 'setup') // 判断是否是setup
         for (const item of node.children) {
             const { source, start: { offset } } = item.loc
