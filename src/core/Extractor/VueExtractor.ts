@@ -50,7 +50,7 @@ import { window } from 'vscode'
 export default class VueExtractor extends Extractor {
     private tagGroup!: Record<TagType, ElementNode[]>
 
-    async extract(code=CurrentFile.text,filepath=CurrentFile.fsPath) {
+    async extract(text=CurrentFile.text,filepath=CurrentFile.fsPath) {
         try {
             this.result = {
                 pureWords: [],
@@ -60,8 +60,8 @@ export default class VueExtractor extends Extractor {
                 template: [],
                 script: [],
             }
-            // const code = CurrentFile.text
-            const ast = this.parse(code,filepath)
+            // const text = CurrentFile.text
+            const ast = this.parse(text,filepath)
             for (const node of ast.children) {
                 if (node.type !== NodeTypes.ELEMENT)
                     continue
@@ -81,8 +81,8 @@ export default class VueExtractor extends Extractor {
         return this.result
     }
 
-    private parse(code: string,filepath:any) {
-        return baseParse(code, {
+    private parse(text: string,filepath:any) {
+        return baseParse(text, {
             isVoidTag:(tag)=>{
                 return tag === 'input' || tag === 'img' || tag === 'br' || tag === 'hr'
             },
