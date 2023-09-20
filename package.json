@@ -2,7 +2,7 @@
   "name": "vue-i18n-op",
   "displayName": "Vue I18n OP",
   "description": "一款辅助开发者快速编写与替换Vue I18n的插件🤳",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "publisher": "HappyFroggy",
   "engines": {
     "vscode": "^1.54.0"

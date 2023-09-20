@@ -1,8 +1,6 @@
 # Change Log
 
-All notable changes to the "vue-i18n-op" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+支持将所选目录下的所有待翻译的文本导出到excel文件中
 
 ## [Unreleased]
 
