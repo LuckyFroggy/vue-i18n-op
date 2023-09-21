@@ -3,13 +3,16 @@ import { window, workspace,Uri } from 'vscode'
 import Config from './Config'
 import fg from 'fast-glob'
 import Extractor from './Extractor'
-import { FileExt } from '..'
+import { FileExt, WordListItem } from '..'
 import fs from 'fs'
 import xlsx from 'node-xlsx';
 import { randomString } from '../utils'
 import TranslatePane from './TranslatePane'
+import LocaleDir from './LocaleDir'
 export default class Global {
-    static async exportAllChineseList(uri:Uri) {
+
+    // 导出翻译模板
+    static async exportToExcel(uri:Uri) {
         let needTransInfomationThen = await window.showInformationMessage('导出的同时是否进行全量翻译？（该过程耗时可能较久）','是','否')
         let needTrans = needTransInfomationThen=='是'
         let exportAllChineseStatusBar = window.setStatusBarMessage('正在分析该目录下需要提取的文件，请稍候...')
@@ -82,6 +85,37 @@ export default class Global {
             return false
         }
         fs.writeFileSync(saveDialogRes?.fsPath, buffer)
+    }
+    // 导入翻译模板
+    static async importExcel() {
+        let targetUris = await window.showOpenDialog({
+            defaultUri: Uri.file(path.join(Config.rootDir)),
+            canSelectFolders: false,
+        })
+        if(!targetUris?.length)return false
+        // 不做判断了，默认选的文件就是xlsx格式的
+        let targetUri = targetUris[0]
+        let sheets = xlsx.parse(targetUri.fsPath);
+        console.log('sheets=>',sheets);
+        // 默认只有一个sheet，取第0项
+        let data = sheets[0].data
+        let wordList:WordListItem[] = []
+        data.shift()
+        for(let i in data){
+            let item = data[i]
+            wordList.push({
+                id:item[0],
+                key:item[0],
+                lang:{
+                    zh:item[5],
+                    en:item[6]
+                }
+            })
+        }
+        LocaleDir.insert({ wordList })
+        window.showInformationMessage('导入成功！')
+        
+        
     }
 }
 async function getTranslateEn(text: string) {

@@ -14,7 +14,7 @@ export default class Inserter {
     static async insert(type: LangType, data: any) {
         const langPath = await LocaleDir.getLangPath(type)
         if (!langPath)
-            throw new Error('找不到i18n翻译配置文件！')
+            throw new Error('找不到i18n翻译配置文件，请先手动创建zh,en文件（.js/.ts/.json）')
 
         const suffix = path.extname(langPath) as LangSuffix
         return this.strategy[suffix].insert(langPath, data)
