@@ -43,11 +43,12 @@ export default class Global {
                 const res = await extractor.extract(code, filepath)
                 if(res.pureWords.length){
                     for(let item of res.words){
-                        let key = `${FILE_NAME}.${randomString(12)}`
+                        
                         if(item.text){
                             if(!chineseTextList.includes(item.text)){
                                 chineseTextList.push(item.text)
                                 let en = needTrans ? await getTranslateEn(item.text) : ''
+                                let key = `${FILE_NAME}.${randomString(12)}`
                                 data.push([key,lastSrc+'/'+childPath,'','否','',item.text,en])
                             }
                             continue
@@ -58,6 +59,7 @@ export default class Global {
                                     if(!chineseTextList.includes(el.text)){
                                         chineseTextList.push(el.text)
                                         let en = needTrans ? await getTranslateEn(el.text) : ''
+                                        let key = `${FILE_NAME}.${randomString(12)}`
                                         data.push([key,lastSrc+'/'+childPath,'','是',item.fullText,el.text,en])
                                     }
                                 }
@@ -97,7 +99,6 @@ export default class Global {
         // 不做判断了，默认选的文件就是xlsx格式的
         let targetUri = targetUris[0]
         let sheets = xlsx.parse(targetUri.fsPath);
-        console.log('sheets=>',sheets);
         // 默认只有一个sheet，取第0项
         let data = sheets[0].data
         let wordList:WordListItem[] = []
@@ -113,7 +114,7 @@ export default class Global {
                 }
             })
         }
-        LocaleDir.insert({ wordList })
+        await LocaleDir.insert({ wordList })
         window.showInformationMessage('导入成功！')
         
         
