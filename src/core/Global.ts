@@ -115,8 +115,6 @@ export default class Global {
             })
         }
         await LocaleDir.insert({ wordList })
-        window.showInformationMessage('导入成功！')
-        
         
     }
 

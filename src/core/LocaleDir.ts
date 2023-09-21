@@ -58,7 +58,7 @@ export default class LocaleDir {
                 zh: {},
             }
             for (const item of wordList) {
-                if (!item.lang.en || !item.lang.zh)
+                if (!item.lang.zh)
                     break
                 langGroup.en[item.key] = item.lang.en
                 langGroup.zh[item.key] = item.lang.zh
