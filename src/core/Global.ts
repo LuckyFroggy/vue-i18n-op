@@ -9,6 +9,7 @@ import xlsx from 'node-xlsx';
 import { randomString } from '../utils'
 import TranslatePane from './TranslatePane'
 import LocaleDir from './LocaleDir'
+import Replacer from './Replacer'
 export default class Global {
 
     // 导出翻译模板
@@ -24,12 +25,12 @@ export default class Global {
             let extname = path.extname(filepath) as any
             return ['.vue','.js','.ts'].includes(extname)
         })
+        exportAllChineseStatusBar.dispose()
         let chineseTextList:string[] = []
         let header = ['key', '页面path', '字符描述', '是否后续人工审查', 'fullText', '简体中文', '英语']
         let data = [
             header
         ];
-        exportAllChineseStatusBar.dispose()
         for(let index in filterChildrenPaths){
             let childPath = filterChildrenPaths[index]
             let currentExportStatusBar = window.setStatusBarMessage(`[${Number(index)+1}/${filterChildrenPaths.length}]当前正在对${lastSrc+'/'+childPath}文件进行处理，请稍候...`)
@@ -116,6 +117,42 @@ export default class Global {
         window.showInformationMessage('导入成功！')
         
         
+    }
+
+    // 替换当前目录下所有中文
+    static async replaceAll(uri:Uri) {
+        let exportAllChineseStatusBar = window.setStatusBarMessage('正在分析该目录下需要提取的文件，请稍候...')
+        const cwd = path.resolve(uri.fsPath) 
+        let lastSrc = uri.path.split('/').pop()
+        let childrenPaths = await fg('**', { cwd })
+        
+        let filterChildrenPaths = childrenPaths.filter(item=>{
+            let filepath = cwd + '/' + item
+            let extname = path.extname(filepath) as any
+            return ['.vue','.js','.ts'].includes(extname) && filepath.indexOf(Config.localeDir) == -1
+        })
+        
+        exportAllChineseStatusBar.dispose()
+        
+        for(let index in filterChildrenPaths){
+            let childPath = filterChildrenPaths[index]
+            let filepath = cwd + '/' + childPath
+            let extname = path.extname(filepath) as any
+            try {
+                let text = fs.readFileSync(filepath,'utf8')
+                const extractor = Extractor(extname)
+                const wordsData = await extractor.extract(text, filepath)
+                let replaceRes = await Replacer.replaceWith(wordsData,filepath)
+                if(!replaceRes){
+                    continue
+                }
+               
+                
+            } catch (error) {
+                console.log('error=>',error);
+            }
+        }
+        window.showInformationMessage('替换成功')
     }
 }
 async function getTranslateEn(text: string) {

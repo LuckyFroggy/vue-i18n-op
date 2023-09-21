@@ -2,7 +2,7 @@
   "name": "vue-i18n-op",
   "displayName": "Vue I18n OP",
   "description": "一款辅助开发者快速编写与替换Vue I18n的插件🤳",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "publisher": "HappyFroggy",
   "engines": {
     "vscode": "^1.54.0"
@@ -25,13 +25,11 @@
         "title": "打开翻译面板",
         "category": "vue-i18n-op",
         "icon": "$(globe)"
-      },
-      {
+      },{
         "command": "vue-i18n-op.replaceWith",
         "title": "替换当前文件",
         "category": "vue-i18n-op"
-      },
-      {
+      },{
         "command": "vue-i18n-op.setLocaleDir",
         "title": "设置i18n文件目录",
         "category": "vue-i18n-op"
@@ -42,6 +40,10 @@
       },{
         "command": "vue-i18n-op.importExcel",
         "title": "导入翻译模板并生成国际化文件",
+        "category": "vue-i18n-op"
+      },{
+        "command": "vue-i18n-op.replaceAll",
+        "title": "替换该目录下所有中文",
         "category": "vue-i18n-op"
       }
     ],
@@ -60,6 +62,11 @@
       "explorer/context": [
         {
           "command": "vue-i18n-op.exportToExcel",
+          "group": "navigation",
+          "when": "explorerResourceIsFolder"
+        },
+        {
+          "command": "vue-i18n-op.replaceAll",
           "group": "navigation",
           "when": "explorerResourceIsFolder"
         },

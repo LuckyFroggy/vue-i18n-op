@@ -1,8 +1,10 @@
 import _ from 'lodash'
-import { Range, WorkspaceEdit, window, workspace } from 'vscode'
+import { Range, Uri, WorkspaceEdit, window, workspace } from 'vscode'
 import Config from '../Config'
 import CurrentFile from '../CurrentFile'
 import LocaleDir from '../LocaleDir'
+import { ExtractorWordObject } from '../Extractor/base'
+import path from 'path'
 export interface ReplaceItem {
     offset: {
         start: number
@@ -11,7 +13,7 @@ export interface ReplaceItem {
     replaceText: string
 }
 export default class Replacer {
-    static async replaceWith() {
+    static async replaceWith(wordsData: { pureWords: string[]; words: ExtractorWordObject[] } | undefined = undefined,filepath: string | undefined = undefined) {
         // 先判断是否设置了vue/js文件的i18n翻译函数名，没有的话弹出设置
         // 获取待替换文本数组，遍历结果
         if (!Config.localeFunName)
@@ -20,16 +22,14 @@ export default class Replacer {
             await this.setLocaleFunName('vueLocaleFunName')
         if (!Config.localeFunName || !Config.vueLocaleFunName)
             return
-        const { words, pureWords } = await CurrentFile.getExtractedWords()
-        console.log('words=>', words, pureWords)
+        const { words, pureWords } = wordsData ?? await CurrentFile.getExtractedWords()
         if (!Config.localeDir)
             await LocaleDir.showSetNotification()
 
-        if (!pureWords.length)
+        if (!pureWords.length && !filepath)
             return window.showInformationMessage('未识别到待替换文本！')
 
         const keyOptions = await this.getKeyOptions(pureWords)
-        console.log('keyOptions===>', keyOptions)
         const replaceList: ReplaceItem[] = []
         for (const item of words) {
             const { type, offset } = item
@@ -71,8 +71,6 @@ export default class Replacer {
                                 replaceText = replaceText.replace(option.source, `\$\{${Config.vueLocaleFunName}('${keyOptions[option.text]}')\}`)
                         }
                     }
-                    console.log('replaceTextreplaceTextreplaceText=>', replaceText)
-
                     replaceList.push({
                         offset,
                         replaceText,
@@ -89,8 +87,6 @@ export default class Replacer {
                     break
                 case 'vue-script-string':
                     if (_.has(keyOptions, item.text)) {
-                        console.log('item=>', item)
-
                         let prefix = ''
                         if (!item.isGlobal && !item.isSetup)
                             prefix = 'this.'
@@ -116,18 +112,25 @@ export default class Replacer {
                     break
             }
         }
-        this.replace(replaceList)
+        this.replace(replaceList,filepath)
     }
 
-    private static async replace(replaceList: ReplaceItem[]) {
+    private static async replace(replaceList: ReplaceItem[],filepath: string | undefined) {
+        let uri = filepath ? Uri.file(filepath) : CurrentFile.getUri;
         const workspaceEdit = new WorkspaceEdit()
         for (const item of replaceList) {
             const { offset: { start, end }, replaceText } = item
+            
+            let res = await window.showTextDocument(uri)
+            let startRange = res.document.positionAt(start)
+            let endRange = res.document.positionAt(end)
             const range = new Range(
-                window.activeTextEditor!.document.positionAt(start),
-                window.activeTextEditor!.document.positionAt(end),
+                startRange,
+                endRange,
             )
-            workspaceEdit.replace(CurrentFile.getUri, range, replaceText)
+            
+            
+            workspaceEdit.replace(uri, range, replaceText)
         }
 
         await workspace.applyEdit(workspaceEdit)

@@ -12,5 +12,6 @@ export default class Commands {
         context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.replaceWith`, () => CurrentFile.replaceWith()))
         context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.exportToExcel`, (uri: Uri) => Global.exportToExcel(uri)))
         context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.importExcel`, (uri: Uri) => Global.importExcel()))
+        context.subscriptions.push(commands.registerCommand(`${global.EXTENSION_NAME}.replaceAll`, (uri: Uri) => Global.replaceAll(uri)))
     }
 }
