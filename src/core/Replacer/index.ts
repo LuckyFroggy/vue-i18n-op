@@ -29,7 +29,7 @@ export default class Replacer {
         if (!pureWords.length && !filepath)
             return window.showInformationMessage('未识别到待替换文本！')
 
-        const keyOptions = await this.getKeyOptions(pureWords)
+        const keyOptions = await this.getKeyOptions(pureWords,filepath)
         const replaceList: ReplaceItem[] = []
         for (const item of words) {
             const { type, offset } = item
@@ -136,16 +136,20 @@ export default class Replacer {
         await workspace.applyEdit(workspaceEdit)
     }
 
-    private static async getKeyOptions(words: string[]) {
+    private static async getKeyOptions(words: string[],filepath: string | undefined) {
         const result: any = {}
         for (const word of words) {
             const keys: string[] = await LocaleDir.findMatchKeys(word)
-            // console.log('word=>', word, keys)
-            if (keys.length === 1)
+            // filepath存在说明是多文件一起替换，这个时候默认取第0项即可
+            if(filepath){
                 result[word] = keys[0]
-            if (keys.length > 1) {
-                const key = await window.showQuickPick(keys, { placeHolder: `选择一个key以替换【${word}】` })
-                key && (result[word] = key)
+            }else{
+                if (keys.length === 1)
+                    result[word] = keys[0]
+                if (keys.length > 1) {
+                    const key = await window.showQuickPick(keys, { placeHolder: `选择一个key以替换【${word}】` })
+                    key && (result[word] = key)
+                }
             }
         }
         return result

@@ -94,7 +94,11 @@ export default class EcmascriptInserter extends Inserter {
                 else {
                     // 如果是非对象表达式，则直接判断是否与传过来的data的key存在相同
                     const key = this.flttenKey(property.key, parentKey)
-                    this.isExistKey(key) && Reflect.deleteProperty(this.data, key) // 删除data中重复的key
+                    if(this.isExistKey(key) && isStringLiteral(property.value)){
+                        // 替换原本重复的key的值，并且删除data中重复的key
+                        property.value.value = this.data[key]
+                        Reflect.deleteProperty(this.data, key)
+                    }
                 }
             }
         })

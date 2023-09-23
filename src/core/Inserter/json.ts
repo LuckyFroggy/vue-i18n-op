@@ -19,14 +19,18 @@ export default class JsonInserter extends Inserter {
 
     private async traverseJson(json: LangJSON, parentKey = '') {
         Object.keys(json).forEach((key: string) => {
-            const value = json[key]
+            let value = json[key]
             if (Object.prototype.toString.call(value) === '[object Object]') {
                 const flttenKeys = this.flttenKey(key, parentKey)
                 this.traverseJson(value, flttenKeys)
             }
             else {
                 const flttenKeys = this.flttenKey(key, parentKey)
-                this.isExistKey(flttenKeys) && Reflect.deleteProperty(this.data, flttenKeys) // 删除data中重复的key
+                if(this.isExistKey(flttenKeys)){
+                    // 替换原本重复的key的值，并且删除data中重复的key
+                    json[flttenKeys] = this.data[flttenKeys]
+                    Reflect.deleteProperty(this.data, flttenKeys)
+                }
             }
         })
     }
