@@ -18,7 +18,8 @@ export default class JSExtractor extends Extractor {
             sourceType: 'unambiguous',
             plugins: [
                 'typescript',
-                'decorators-legacy'
+                'decorators-legacy',
+                'jsx'
             ],
         })
 

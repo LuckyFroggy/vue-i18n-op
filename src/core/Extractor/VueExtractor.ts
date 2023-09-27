@@ -200,6 +200,7 @@ export default class VueExtractor extends Extractor {
                 plugins: [
                     'typescript',
                     'decorators-legacy',
+                    'jsx'
                 ],
             })
             traverse(ast, {

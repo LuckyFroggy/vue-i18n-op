@@ -60,7 +60,7 @@ export default class LocaleDir {
             for (const item of wordList) {
                 if (!item.lang.zh)
                     break
-                langGroup.en[item.key] = item.lang.en
+                langGroup.en[item.key] = item.lang.en ?? ''
                 langGroup.zh[item.key] = item.lang.zh
             }
             const res = await Promise.all(Object.keys(langGroup).map((type) => {
@@ -94,12 +94,7 @@ export default class LocaleDir {
     static async getChildrenPaths() {
         if (!Config.localeDir)
             return []
-            console.log('Config.rootDir=>',Config.rootDir);
-            console.log('Config.localeDir=>',Config.localeDir);
-            
-            
         const cwd = path.resolve(Config.rootDir, Config.localeDir)
-        console.log('cwd=>',cwd);
         return await fg('**', { cwd })
     }
 

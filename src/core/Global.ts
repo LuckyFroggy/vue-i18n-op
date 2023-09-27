@@ -110,7 +110,7 @@ export default class Global {
                 key:item[0],
                 lang:{
                     zh:item[5],
-                    en:item[6]
+                    en:item[6] ?? ''
                 }
             })
         }

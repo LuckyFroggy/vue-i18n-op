@@ -142,7 +142,7 @@ export default class Replacer {
             const keys: string[] = await LocaleDir.findMatchKeys(word)
             // filepath存在说明是多文件一起替换，这个时候默认取第0项即可
             if(filepath){
-                result[word] = keys[0]
+                keys.length && (result[word] = keys[0])
             }else{
                 if (keys.length === 1)
                     result[word] = keys[0]
