@@ -133,7 +133,6 @@ export default class TranslatePane {
             res.forEach((item, index) => {
                 if (item.status === 'fulfilled') {
                     const { trans_result = [] } = item?.value?.data
-                    console.log('item?.value=>',item?.value);
                     trans_result[0]?.dst && (wordList[index].lang.en = trans_result[0]?.dst)
                 }
             })

@@ -12,9 +12,6 @@ export const useStore = defineStore('app', {
         init(data: { uri: string; extractedWords: string[] }) {
             this.wordList = []
             const { uri, extractedWords } = data
-            console.log('uri=>', uri)
-            console.log('')
-
             const FILE_NAME = uri.replace(/\/|\\/g, '\n').split('\n').slice(-1)[0]?.split('.')?.[0] ?? 'key'
             extractedWords.forEach((item: string) => {
                 this.wordList.push({

@@ -23,7 +23,6 @@ export default class JSImporter extends Importer {
             Program: {
                 enter: (path) => {
                     let hasI18nPath = path.node.body.some(item=>{
-                        console.log(item)
                         return isImportDeclaration(item) 
                             && item.specifiers.length == 1 
                             && isImportDefaultSpecifier(item.specifiers[0]) 
@@ -39,11 +38,7 @@ export default class JSImporter extends Importer {
             },
         })
         const { code } = generate(ast)
-        console.log('code=>',code);
-        
         let fullPath = path.join(filepath)
-        console.log('fullPath=>',fullPath);
-        
         writeFileSync(fullPath, code)
     }
 }

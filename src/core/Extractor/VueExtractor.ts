@@ -173,7 +173,18 @@ export default class VueExtractor extends Extractor {
                     })
                     const templateChars = content.match(/`[^`]*`/gm) ?? []
                     templateChars.forEach((qchar: string) => {
-                        const chars = qchar.replace(/('[^']*'|"[^"]*")/gm, '').replace(/(\{\{|\}\})/g, '\n').replace(/`/g, '\n').replace(/\$\{(.*)*\}/g, '\n').split('\n') ?? []
+                        let chars:string[] = []
+                        try {
+                            chars = qchar
+                                .replace(/('[^']*'|"[^"]*")/gm, '')
+                                .replace(/(\{\{|\}\})/g, '\n')
+                                .replace(/`/g, '\n')
+                                .replace(/\$\{[^}]*\}/g, '\n')
+                                .split('\n') ?? []
+                        } catch (error) {
+                            console.log('error=>',error);
+                        }
+                        
                         chars.forEach(char => {
                             if (this.isExistChinese(char)) {
                                 params.replaceTexts.push({
@@ -318,7 +329,7 @@ export default class VueExtractor extends Extractor {
                     })
                     const templateChars = content.match(/`[^`]*`/gm) ?? []
                     templateChars.forEach((qchar: string) => {
-                        const chars = qchar.replace(/('[^']*'|"[^"]*")/gm, '').replace(/(\{\{|\}\})/g, '\n').replace(/`/g, '\n').replace(/\$\{(.*)*\}/g, '\n').split('\n') ?? []
+                        const chars = qchar.replace(/('[^']*'|"[^"]*")/gm, '').replace(/(\{\{|\}\})/g, '\n').replace(/`/g, '\n').replace(/\$\{[^}]*\}/g, '\n').split('\n') ?? []
                         chars.forEach(char => {
                             if (this.isExistChinese(char)) {
                                 params.replaceTexts.push({

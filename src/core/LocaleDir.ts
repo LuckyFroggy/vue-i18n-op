@@ -13,23 +13,17 @@ import LangParser from './LangParser'
 export default class LocaleDir {
     static async set(): Promise<void> {
         const dir = await this.pickDir()
-        console.log('dir=>',dir);
-        
         await Config.set('localeDir', dir[0])
     }
 
     static async pickDir() {
         const rootPath = workspace.workspaceFolders?.[0]?.uri?.fsPath
-        console.log('rootPath=>',rootPath);
-        
         if (!rootPath)
             return []
         const result = await window.showOpenDialog({
             defaultUri: Uri.file(rootPath),
             canSelectFolders: true,
         })
-        console.log('result=>',result);
-        
         if (!result)
             return []
 

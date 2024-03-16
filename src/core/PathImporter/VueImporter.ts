@@ -100,7 +100,6 @@ export default class VueImporter extends Importer {
                 Program: {
                     enter: (path) => {
                         let hasI18nPath = path.node.body.some(item=>{
-                            console.log(item)
                             return isImportDeclaration(item) 
                                 && item.specifiers.length == 1 
                                 && isImportDefaultSpecifier(item.specifiers[0]) 

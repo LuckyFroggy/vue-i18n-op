@@ -72,8 +72,6 @@ function handleMessage(event: { type: any; data: any }) {
 }
 
 function translate(item: WordListItem) {
-  console.log('translate=>dwdww');
-  
     postMessage('translate', item)
 }
 

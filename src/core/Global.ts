@@ -1,5 +1,5 @@
 import path from 'path'
-import { window, workspace,Uri } from 'vscode'
+import { window, workspace,Uri, ProgressLocation } from 'vscode'
 import Config from './Config'
 import fg from 'fast-glob'
 import Extractor from './Extractor'
@@ -11,12 +11,22 @@ import TranslatePane from './TranslatePane'
 import LocaleDir from './LocaleDir'
 import Replacer from './Replacer'
 export default class Global {
+    static logChannel = window.createOutputChannel('Vue I18n Op');
 
+    static appendLine(msg: string) {
+        const timestamp = new Date().toLocaleString();
+
+        this.logChannel.appendLine(`${timestamp} [info] ${msg}`);
+    }
     // 导出翻译模板
     static async exportToExcel(uri:Uri) {
-        let needTransInfomationThen = await window.showInformationMessage('导出的同时是否进行全量翻译？（该过程耗时可能较久）','是','否')
+        let needTransInfomationThen = await window.showInformationMessage('是否在导出时进行机器翻译？','是','否')
+        // undefined 代表用户取消了
+        if(!needTransInfomationThen) return false;
         let needTrans = needTransInfomationThen=='是'
-        let exportAllChineseStatusBar = window.setStatusBarMessage('正在分析该目录下需要提取的文件，请稍候...')
+        this.logChannel.clear();
+        this.logChannel.show();
+        this.appendLine('正在分析该目录下需要提取的文件，请稍候...');
         const cwd = path.resolve(uri.fsPath) 
         let lastSrc = uri.path.split('/').pop()
         let childrenPaths = await fg('**', { cwd })
@@ -25,7 +35,7 @@ export default class Global {
             let extname = path.extname(filepath) as any
             return ['.vue','.js','.ts'].includes(extname)
         })
-        exportAllChineseStatusBar.dispose()
+        // exportAllChineseStatusBar.dispose()
         let chineseTextList:string[] = []
         let header = ['key', '页面path', '字符描述', '是否后续人工审查', 'fullText', '简体中文', '英语']
         let data = [
@@ -33,7 +43,8 @@ export default class Global {
         ];
         for(let index in filterChildrenPaths){
             let childPath = filterChildrenPaths[index]
-            let currentExportStatusBar = window.setStatusBarMessage(`[${Number(index)+1}/${filterChildrenPaths.length}]当前正在对${lastSrc+'/'+childPath}文件进行处理，请稍候...`)
+            this.appendLine(`[${Number(index)+1}/${filterChildrenPaths.length}]正在提取 ${lastSrc+'/'+childPath} 文件，请稍候...`);
+            // let currentExportStatusBar = window.setStatusBarMessage(`[${Number(index)+1}/${filterChildrenPaths.length}]当前正在对${lastSrc+'/'+childPath}文件进行处理，请稍候...`)
             let filepath = cwd + '/' + childPath
             const FILE_NAME = childPath.replace(/\/|\\/g, '\n').split('\n').slice(-1)[0]?.split('.')?.[0] ?? 'key'
             let extname = path.extname(filepath) as any
@@ -71,15 +82,15 @@ export default class Global {
             } catch (error) {
                 console.log('error=>',error);
             }
-            currentExportStatusBar.dispose()
+            // currentExportStatusBar.dispose()
         }
-        // let str = `let res = ${JSON.stringify(result,null,4)}`
-        
-        var buffer = xlsx.build([{name: '所选目录下所有中文表格', data: data, options:{
+        this.appendLine('提取完成，正在生成表格，请稍候...');
+        let excelName = `export_template_${new Date().getTime()}`
+        var buffer = xlsx.build([{name: excelName, data: data, options:{
             '!cols':[{wch: 10}, {wch: 30}, {wch: 30}, {wch: 10},{wch: 40},{wch: 60},{wch: 40}]
         }}]);
         let saveDialogRes = await window.showSaveDialog({
-            defaultUri: Uri.file(path.join(Config.rootDir, `所选目录下所有中文表格.xlsx`)),
+            defaultUri: Uri.file(path.join(Config.rootDir, `${excelName}.xlsx`)),
             filters:{
                 'Excel':['xlsx']
             },
@@ -88,6 +99,7 @@ export default class Global {
             return false
         }
         fs.writeFileSync(saveDialogRes?.fsPath, buffer)
+        this.appendLine('导出任务成功！');
     }
     // 导入翻译模板
     static async importExcel() {
