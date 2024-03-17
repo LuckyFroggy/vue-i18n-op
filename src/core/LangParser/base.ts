@@ -13,4 +13,6 @@ export default abstract class LangParser {
         return readFileSync(dir, 'utf8')
     }
     abstract findMatchKeys(langPath: string, word: string): Promise<string[]>
+
+    abstract findLangByKey(langPath: string, key: string): Promise<string>
 }

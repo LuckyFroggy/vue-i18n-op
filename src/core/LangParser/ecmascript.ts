@@ -6,6 +6,33 @@ import { isIdentifier, isObjectExpression, isObjectProperty, isStringLiteral } f
 import LangParser from './base'
 
 export default class EcmascriptLangParser extends LangParser {
+    private _lang: string = ''
+    private _key: string = ''
+    async findLangByKey(langPath: string, key: string){
+        this._lang = ''
+        this._key = key
+        const code = this.getCode(langPath) || 'export default { }'
+        const ast = parse(code, {
+            sourceType: 'unambiguous',
+        })
+        const declarationStrategy: Record<string, (p: NodePath, path: NodePath<ExportDefaultDeclaration>) => void> = {
+            Identifier: this.traverseIdentifier.bind(this),
+            ObjectExpression: this.traverseObjectExpression.bind(this),
+        }
+        traverse(ast, {
+            Program: {
+                enter(p) {
+                    p.traverse({
+                        ExportDefaultDeclaration(path) {
+                            declarationStrategy[path.node.declaration.type](p, path)
+                        },
+                    })
+                },
+            },
+        })
+        return this._lang
+
+    }
     async findMatchKeys(langPath: string, word: string): Promise<string[]> {
         this._word = word
         this._keys = []
@@ -65,6 +92,9 @@ export default class EcmascriptLangParser extends LangParser {
                 else {
                     // 如果是非对象表达式，则直接判断是否与传过来的data的key存在相同
                     const key = this.flttenKey(property.key, parentKey)
+                    if(key === this._key && isStringLiteral(property.value)) {
+                        this._lang = property.value.value
+                    }
                     if (isStringLiteral(property.value) && property.value.value === this._word)
                         this._keys.push(key)
                 }

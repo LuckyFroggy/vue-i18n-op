@@ -11,6 +11,15 @@ export default class LangParser {
         '.json': new JsonLangParser(),
     }
 
+    static async findLangByKey(key:string) {
+        const langPath =  await LocaleDir.getLangPath('zh')
+        if (!langPath){
+            return ''
+        }
+        const suffix = path.extname(langPath) as LangSuffix
+        return this.strategy[suffix].findLangByKey(langPath, key)
+    }
+
     static async findMatchKeys(word: string) {
         const langPath = await LocaleDir.getLangPath('zh')
         if (!langPath)

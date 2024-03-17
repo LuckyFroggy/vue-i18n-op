@@ -121,4 +121,11 @@ export default class LocaleDir {
             throw new Error('找不到i18n翻译配置文件！')
         return await LangParser.findMatchKeys(word)
     }
+
+    static async findLangByKey(key: string): Promise<string> {
+        if (!Config.localeDir) {
+            return ''
+        }
+        return await LangParser.findLangByKey(key)
+    }
 }
