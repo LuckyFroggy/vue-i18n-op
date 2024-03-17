@@ -2,7 +2,7 @@
   "name": "vue-i18n-op",
   "displayName": "Vue I18n OP",
   "description": "一款辅助开发者快速编写与替换Vue I18n的插件🤳",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "publisher": "HappyFroggy",
   "engines": {
     "vscode": "^1.54.0"
@@ -25,23 +25,28 @@
         "title": "打开翻译面板",
         "category": "vue-i18n-op",
         "icon": "$(globe)"
-      },{
+      },
+      {
         "command": "vue-i18n-op.replaceWith",
         "title": "替换当前文件",
         "category": "vue-i18n-op"
-      },{
+      },
+      {
         "command": "vue-i18n-op.setLocaleDir",
         "title": "设置i18n文件目录",
         "category": "vue-i18n-op"
-      },{
+      },
+      {
         "command": "vue-i18n-op.exportToExcel",
         "title": "导出该目录下所有中文到翻译模板",
         "category": "vue-i18n-op"
-      },{
+      },
+      {
         "command": "vue-i18n-op.importExcel",
         "title": "导入翻译模板并生成国际化文件",
         "category": "vue-i18n-op"
-      },{
+      },
+      {
         "command": "vue-i18n-op.replaceAll",
         "title": "替换该目录下所有中文",
         "category": "vue-i18n-op"
@@ -168,9 +173,7 @@
     "axios": "^0.27.2",
     "crypto-js": "^4.1.1",
     "dom-serializer": "^2.0.0",
-    "exceljs": "^4.3.0",
     "fast-glob": "^3.2.11",
-    "gogocode": "^1.0.53",
     "htmlparser2": "^8.0.1",
     "lodash": "^4.17.21",
     "node-xlsx": "^0.23.0",

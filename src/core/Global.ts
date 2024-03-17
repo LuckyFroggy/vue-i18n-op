@@ -24,9 +24,11 @@ export default class Global {
         // undefined 代表用户取消了
         if(!needTransInfomationThen) return false;
         let needTrans = needTransInfomationThen=='是'
+
         this.logChannel.clear();
         this.logChannel.show();
         this.appendLine('正在分析该目录下需要提取的文件，请稍候...');
+
         const cwd = path.resolve(uri.fsPath) 
         let lastSrc = uri.path.split('/').pop()
         let childrenPaths = await fg('**', { cwd })
@@ -35,71 +37,83 @@ export default class Global {
             let extname = path.extname(filepath) as any
             return ['.vue','.js','.ts'].includes(extname)
         })
-        // exportAllChineseStatusBar.dispose()
+
         let chineseTextList:string[] = []
         let header = ['key', '页面path', '字符描述', '是否后续人工审查', 'fullText', '简体中文', '英语']
         let data = [
             header
         ];
-        for(let index in filterChildrenPaths){
-            let childPath = filterChildrenPaths[index]
-            this.appendLine(`[${Number(index)+1}/${filterChildrenPaths.length}]正在提取 ${lastSrc+'/'+childPath} 文件，请稍候...`);
-            // let currentExportStatusBar = window.setStatusBarMessage(`[${Number(index)+1}/${filterChildrenPaths.length}]当前正在对${lastSrc+'/'+childPath}文件进行处理，请稍候...`)
-            let filepath = cwd + '/' + childPath
-            const FILE_NAME = childPath.replace(/\/|\\/g, '\n').split('\n').slice(-1)[0]?.split('.')?.[0] ?? 'key'
-            let extname = path.extname(filepath) as any
-            try {
-                let code = fs.readFileSync(filepath,'utf8')
-                const extractor = Extractor(extname)
-                const res = await extractor.extract(code, filepath)
-                if(res.pureWords.length){
-                    for(let item of res.words){
-                        
-                        if(item.text){
-                            if(!chineseTextList.includes(item.text)){
-                                chineseTextList.push(item.text)
-                                let en = needTrans ? await getTranslateEn(item.text) : ''
-                                let key = `${FILE_NAME}.${randomString(12)}`
-                                data.push([key,lastSrc+'/'+childPath,'','否','',item.text,en])
+        window.withProgress({
+            location: ProgressLocation.Notification,
+            title: '',
+            cancellable: true
+        }, async (progress, token) => {
+            let isExporting = true
+            token.onCancellationRequested(() => {
+                this.appendLine('导出任务已取消！');
+                isExporting = false
+            });
+            for(let index in filterChildrenPaths){
+                if(!isExporting) return false
+                let childPath = filterChildrenPaths[index]
+                progress.report({ message: `正在处理 ${lastSrc+'/'+childPath} 文件` });
+                this.appendLine(`[${Number(index)+1}/${filterChildrenPaths.length}]正在处理 ${lastSrc+'/'+childPath} 文件，请稍候...`);
+                let filepath = cwd + '/' + childPath
+                const FILE_NAME = childPath.replace(/\/|\\/g, '\n').split('\n').slice(-1)[0]?.split('.')?.[0] ?? 'key'
+                let extname = path.extname(filepath) as any
+                try {
+                    let code = fs.readFileSync(filepath,'utf8')
+                    const extractor = Extractor(extname)
+                    const res = await extractor.extract(code, filepath)
+                    if(res.pureWords.length){
+                        for(let item of res.words){
+                            if(item.text){
+                                if(!chineseTextList.includes(item.text)){
+                                    chineseTextList.push(item.text)
+                                    let en = needTrans ? await getTranslateEn(item.text) : ''
+                                    let key = `${FILE_NAME}.${randomString(12)}`
+                                    data.push([key,lastSrc+'/'+childPath,'','否','',item.text,en])
+                                }
+                                continue
                             }
-                            continue
-                        }
-                        if(item.type == 'vue-template-interpolation' || item.type == 'vue-directive-text'){
-                            if(item.replaceTexts && item.replaceTexts.length){
-                                for(let el of item.replaceTexts){
-                                    if(!chineseTextList.includes(el.text)){
-                                        chineseTextList.push(el.text)
-                                        let en = needTrans ? await getTranslateEn(el.text) : ''
-                                        let key = `${FILE_NAME}.${randomString(12)}`
-                                        data.push([key,lastSrc+'/'+childPath,'','是',item.fullText,el.text,en])
+                            if(item.type == 'vue-template-interpolation' || item.type == 'vue-directive-text'){
+                                if(item.replaceTexts && item.replaceTexts.length){
+                                    for(let el of item.replaceTexts){
+                                        if(!chineseTextList.includes(el.text)){
+                                            chineseTextList.push(el.text)
+                                            let en = needTrans ? await getTranslateEn(el.text) : ''
+                                            let key = `${FILE_NAME}.${randomString(12)}`
+                                            data.push([key,lastSrc+'/'+childPath,'','是',item.fullText,el.text,en])
+                                        }
                                     }
                                 }
+                                continue
                             }
-                            continue
                         }
                     }
+                } catch (error) {
+                    console.log('error=>',error);
                 }
-            } catch (error) {
-                console.log('error=>',error);
             }
-            // currentExportStatusBar.dispose()
-        }
-        this.appendLine('提取完成，正在生成表格，请稍候...');
-        let excelName = `export_template_${new Date().getTime()}`
-        var buffer = xlsx.build([{name: excelName, data: data, options:{
-            '!cols':[{wch: 10}, {wch: 30}, {wch: 30}, {wch: 10},{wch: 40},{wch: 60},{wch: 40}]
-        }}]);
-        let saveDialogRes = await window.showSaveDialog({
-            defaultUri: Uri.file(path.join(Config.rootDir, `${excelName}.xlsx`)),
-            filters:{
-                'Excel':['xlsx']
-            },
+            if(!isExporting) return false
+            progress.report({ message: `处理完成`,increment:100 });
+            this.appendLine('处理完成');
+            let excelName = `export_template_${new Date().getTime()}`
+            var buffer = xlsx.build([{name: excelName, data: data, options:{
+                '!cols':[{wch: 10}, {wch: 30}, {wch: 30}, {wch: 10},{wch: 40},{wch: 60},{wch: 40}]
+            }}]);
+            let saveDialogRes = await window.showSaveDialog({
+                defaultUri: Uri.file(path.join(Config.rootDir, `${excelName}.xlsx`)),
+                filters:{
+                    'Excel':['xlsx']
+                },
+            })
+            if (!saveDialogRes) {
+                return false
+            }
+            fs.writeFileSync(saveDialogRes?.fsPath, buffer)
+            this.appendLine('导出任务成功！');
         })
-        if (!saveDialogRes) {
-            return false
-        }
-        fs.writeFileSync(saveDialogRes?.fsPath, buffer)
-        this.appendLine('导出任务成功！');
     }
     // 导入翻译模板
     static async importExcel() {
