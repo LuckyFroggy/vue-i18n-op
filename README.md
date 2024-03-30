@@ -3,6 +3,11 @@
 
 这是一款辅助开发者快速编写与替换Vue I18n的工具。
 
+[![Version](https://img.shields.io/visual-studio-marketplace/v/happyfroggy.vue-i18n-op?logo=visual%20studio%20code&label=VS%20Code%20Marketplace
+)](https://marketplace.visualstudio.com/items?itemName=happyfroggy.vue-i18n-op) [![Download](https://img.shields.io/visual-studio-marketplace/d/happyfroggy.vue-i18n-op?label=Downloads
+)](https://marketplace.visualstudio.com/items?itemName=happyfroggy.vue-i18n-op) [![Installs](https://img.shields.io/visual-studio-marketplace/i/happyfroggy.vue-i18n-op?label=Installs
+)](https://marketplace.visualstudio.com/items?itemName=happyfroggy.vue-i18n-op) [![Stars](https://img.shields.io/visual-studio-marketplace/stars/happyfroggy.vue-i18n-op?label=Stars)](https://marketplace.visualstudio.com/items?itemName=happyfroggy.vue-i18n-op) [![Stars](https://img.shields.io/github/stars/LuckyFroggy/vue-i18n-op)](https://github.com/LuckyFroggy/vue-i18n-op)
+
 ## 主要能力
 
 * **支持Vue/Vue3（选项式 API/组合式 API）文件的翻译和替换**
