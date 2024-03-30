@@ -2,7 +2,7 @@
   "name": "vue-i18n-op",
   "displayName": "Vue I18n OP",
   "description": "一款辅助开发者快速编写与替换Vue I18n的插件🤳",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "publisher": "HappyFroggy",
   "engines": {
     "vscode": "^1.54.0"
@@ -20,6 +20,16 @@
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "vue-i18n-op.showChineseAnnotation",
+        "title": "显示中文注释",
+        "category": "vue-i18n-op"
+      },
+      {
+        "command": "vue-i18n-op.hideChineseAnnotation",
+        "title": "隐藏中文注释",
+        "category": "vue-i18n-op"
+      },
       {
         "command": "vue-i18n-op.openTranslatePane",
         "title": "打开翻译面板",
@@ -56,10 +66,17 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "vue-i18n-op.openTranslatePane",
-          "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
+          "command": "vue-i18n-op.showChineseAnnotation",
+          "when": "!chineseAnnotationVisible && (resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript)"
         },
         {
+          "command": "vue-i18n-op.hideChineseAnnotation",
+          "when": "chineseAnnotationVisible && (resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript)"
+        },
+        {
+          "command": "vue-i18n-op.openTranslatePane",
+          "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
+        },{
           "command": "vue-i18n-op.replaceWith",
           "when": "resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript"
         }
@@ -81,6 +98,16 @@
         }
       ],
       "editor/context": [
+        {
+          "command": "vue-i18n-op.showChineseAnnotation",
+          "group": "navigation",
+          "when": "!chineseAnnotationVisible && (resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript)"
+        },
+        {
+          "command": "vue-i18n-op.hideChineseAnnotation",
+          "group": "navigation",
+          "when": "chineseAnnotationVisible && (resourceLangId == vue || resourceLangId == javascript || resourceLangId == typescript)"
+        },
         {
           "command": "vue-i18n-op.openTranslatePane",
           "group": "navigation",
@@ -116,12 +143,17 @@
         "vue-i18n-op.vueLocaleFunName": {
           "type": "string",
           "default": "",
-          "description": "设置vue文件的i18n插值函数名（例如$t）"
+          "description": "设置Vue文件的i18n插值函数名（例如$t）"
         },
         "vue-i18n-op.relativeI18nPath": {
           "type": "string",
           "default": "",
           "description": "设置导入i18n时的相对路径（例如:'@/lang/index.js'），用于在文件中生成import i18n from 'i18n相对路径'"
+        },
+        "vue-i18n-op.chineseAnnotationVisible": {
+          "type": "boolean",
+          "default": true,
+          "description": "设置是否显示中文注释"
         }
       }
     }

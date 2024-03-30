@@ -24,6 +24,10 @@ export default class Config {
         return this.getConfiguration<string>('relativeI18nPath') ?? ''
     }
 
+    static get chineseAnnotationVisible(): boolean {
+        return this.getConfiguration<boolean>('chineseAnnotationVisible') ?? true
+    }
+
     private static getConfiguration<T>(key: string): T | undefined {
         return workspace
             .getConfiguration(global.EXTENSION_NAME)

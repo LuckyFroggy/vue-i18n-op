@@ -2,14 +2,12 @@
 import * as vscode from 'vscode'
 import { debounce } from 'lodash'
 import LocaleDir from './LocaleDir'
+import { commands } from 'vscode'
+import * as global from '../utils/global'
+import Config from './Config'
+let textEditorDecorationType: vscode.TextEditorDecorationType | undefined = undefined
 
-const textEditorDecorationType = vscode.window.createTextEditorDecorationType(
-  {}
-)
-
-const unuseDecorationType = vscode.window.createTextEditorDecorationType({
-  opacity: '0.6'
-})
+let unuseDecorationType: vscode.TextEditorDecorationType | undefined = undefined
 
 class Annotation {
   KEY_REG = /(?:\$t|\$tc|\$d|\$n|\$te|this\.t|i18n\.t|[^\w]t)\(['"]([^]+?)['"]/g
@@ -21,16 +19,46 @@ class Annotation {
 
     disposables.push(
       vscode.window.onDidChangeActiveTextEditor(debounceUpdate),
-      vscode.workspace.onDidChangeTextDocument(debounceUpdate)
+      vscode.workspace.onDidChangeTextDocument(debounceUpdate),
+      commands.registerCommand(`${global.EXTENSION_NAME}.showChineseAnnotation`, () => this.showChineseAnnotation()),
+      commands.registerCommand(`${global.EXTENSION_NAME}.hideChineseAnnotation`, () => this.hideChineseAnnotation())
     )
+    vscode.workspace.onDidChangeConfiguration((event) => {
+      if (event.affectsConfiguration(`${global.EXTENSION_NAME}.chineseAnnotationVisible`)) {
+        if(!Config.chineseAnnotationVisible){
+          textEditorDecorationType?.dispose()
+          unuseDecorationType?.dispose()
+        }else{
+          this.update()
+        }
+        
+      }
+  });
+  }
+
+  showChineseAnnotation(){
+    Config.set('chineseAnnotationVisible', true)
+  }
+
+  hideChineseAnnotation(){
+    Config.set('chineseAnnotationVisible', false)
   }
 
   async update() {
 
     const activeTextEditor = vscode.window.activeTextEditor
-    if (!activeTextEditor) {
+    if (!activeTextEditor || !Config.chineseAnnotationVisible) {
       return
     }
+    textEditorDecorationType?.dispose()
+    unuseDecorationType?.dispose()
+    textEditorDecorationType = vscode.window.createTextEditorDecorationType(
+      {}
+    )
+    
+    unuseDecorationType = vscode.window.createTextEditorDecorationType({
+      opacity: '0.6'
+    })
     
 
     const { document } = activeTextEditor
@@ -74,6 +102,7 @@ class Annotation {
       activeTextEditor.setDecorations(textEditorDecorationType, decorations)
     }
   }
+
 }
 
 export const annotationDisposables = () => {
